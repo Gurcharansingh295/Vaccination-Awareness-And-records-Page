@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Vaccination Appointment</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="headall">
+  <h1>Good Health & Well Being</h1>
+  <p>Vaccination Awareness & Record Tracking</p>
+  <nav>
+    <ul>
+  <li><a href="index.html">Home</a></li>
+  <li><a href="aware.html">Vaccination Awareness</a></li>
+  <li><a href="records.html">Vaccination Records</a></li>
+  <li><a href="appointment.html">Book Appointment</a></li>
+  <li><a href="heathtips.html">Health Tips</a></li>
+  <li><a href="contactus.html">Contact Us</a></li>
+    </ul>
+</nav>
+</header>
+
+<div class="form-container">
+<h2>Book Your Vaccination Appointment</h2>
+
+<form id="appointmentForm">
+
+<label>Full Name</label>
+<input type="text" placeholder="Enter your full name" required id="name">
+
+<label>ID Number</label>
+<input type="id" placeholder="Enter your ID number" required id="id">
+
+<label>Email</label>
+<input type="email" placeholder="Enter your email" required id="email">
+
+<label>Phone Number</label>
+<input type="tel" placeholder="Enter your phone number" required id="phone">
+
+<label>Age</label>
+<input type="number" placeholder="Enter your age" required id="age">
+
+<label>Select Vaccine</label>
+<select required id="vaccine">
+<option value="">-- Select Vaccine --</option>
+<option>COVID-19</option>
+<option>Hepatitis B</option>
+<option>Polio</option>
+<option>MMR</option>
+<option>Tetanus</option>
+</select>
+
+<label>Type Of Appointment</label>
+<select required id="typeappoint">
+<option value="">-- Select Type Of Appointment --</option>
+<option>1st Appointment</option>
+<option>Follow Up Appointment</option>
+</select>
+
+<label>Preferred Date</label>
+<input type="date" required id="date">
+
+<label>Additional Notes</label>
+<textarea rows="4" placeholder="Any additional information..." id="notes"></textarea>
+
+<button type="submit">Book Appointment</button>
+</form>
+</div>
+
+<footer>
+<p>© 2025 Good Health & Vaccination Awareness Initiative</p>
+</footer>
+
+<script>
+document.getElementById("appointmentForm").addEventListener("submit", function(e){
+    e.preventDefault();
+
+    let data = {
+        name: document.getElementById("name").value,
+        email: document.getElementById("email").value,
+        phone: document.getElementById("phone").value,
+        age: document.getElementById("age").value,  
+        vaccine: document.getElementById("vaccine").value,
+        date: document.getElementById("date").value,
+        id: document.getElementById("id").value,
+        typeofappointment : document.getElementById("typeappoint").value,
+        notes: document.getElementById("notes").value  
+    };
+
+    fetch("https://script.google.com/macros/s/AKfycbxUj3bwv6eHWysc_Nz72OwbQZSV9Spacb7CvYHVHiBDiCMHuWOOVboLQZjmRLW-190ouw/exec",{
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    })
+    .then(() => {
+        alert("Appointment Booked Succesfully");
+        document.getElementById("appointmentForm").reset();
+    })
+    .catch(err => {
+        alert("Error: " + err);
+    });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<title>Vaccination Records</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="headall">
+  <h1>Good Health & Well Being</h1>
+  <p>Vaccination Awareness & Record Tracking</p>
+  <nav>
+    <ul>
+  <li><a href="index.html">Home</a></li>
+  <li><a href="aware.html">Vaccination Awareness</a></li>
+  <li><a href="records.html">Vaccination Records</a></li>
+  <li><a href="appointment.html">Book Appointment</a></li>
+  <li><a href="heathtips.html">Health Tips</a></li>
+  <li><a href="contactus.html">Contact Us</a></li>
+    </ul>
+</nav>
+</header>
+
+<div class="records-container">
+  <h2>Stored Vaccination Records</h2>
+  <p>Below is the list of vaccination appointments stored in the system.</p>
+
+<div class="search-box">
+  <input type="text" id="searchId" placeholder="Enter ID">
+  <button id="searchBtn">Search</button>
+</div>
+
+
+  <table>
+    <thead>
+      <tr>
+        <th>Full Name</th>
+        <th>ID</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Age</th>
+        <th>Vaccine</th>
+        <th>Date</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody id="recordsTable">
+      
+      <tr>
+        <td colspan="7" style="text-align:center; padding:15px;">No records loaded yet</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="upload-box">
+    <h3>Upload Vaccination Document</h3>
+    <p>Upload scanned vaccination documents (PDF, image, etc.)</p>
+    <input type="file" accept=".pdf, .jpg, .png">
+    <button>Upload</button>
+  </div>
+</div>
+
+<script>
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxCm0H4NIopeDgENsVegxX7licMdFpM5m7bnuxcxGPnhgtfiu5QK9QppQSS4klS57gM/exec";  // Replace after deploying script
+
+let allRecords = [];
+
+async function fetchAllRecords() {
+  try {
+    const res = await fetch("https://script.google.com/macros/s/AKfycbxCm0H4NIopeDgENsVegxX7licMdFpM5m7bnuxcxGPnhgtfiu5QK9QppQSS4klS57gM/exec?action=getRecords");
+    allRecords = await res.json();
+  } catch (err) {
+    console.error("Load error:", err);
+  }
+}
+
+function renderRows(rows) {
+  const table = document.getElementById("recordsTable");
+  table.innerHTML = "";
+
+  if (rows.length === 0) {
+    table.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:15px;">No record found</td></tr>`;
+    return;
+  }
+
+  rows.forEach(r => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${r.name}</td>
+      <td>${r.id}</td>
+      <td>${r.email}</td>
+      <td>${r.phone}</td>
+      <td>${r.age}</td>
+      <td>${r.vaccine} ${r.vaccinationTaken === "Yes" ? "✔" : "✘"}</td>
+      <td>${r.date}</td>
+      <td>${r.notes}</td>
+    `;
+    table.appendChild(tr);
+  });
+}
+
+function searchById() {
+  const id = document.getElementById("searchId").value.trim();
+  const result = allRecords.filter(r => String(r.id).trim() === id);
+  renderRows(result);
+}
+
+function uploadDocument() {
+  const id = document.getElementById("searchId").value.trim();
+  const fileInput = document.getElementById("fileInput");
+  const file = fileInput.files[0];
+
+  if (!id) return alert("Enter your ID first");
+  if (!file) return alert("Select a file first");
+
+  const reader = new FileReader();
+  reader.onload = async e => {
+    const base64 = e.target.result.split(",")[1];
+
+    const payload = {
+      action: "uploadDocument",
+      id: id,
+      filename: file.name,
+      mime: file.type,
+      base64: base64
+    };
+
+    const res = await fetch(WEB_APP_URL, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(payload)
+    });
+
+    alert(await res.text());
+    await fetchAllRecords();
+    searchById();
+  };
+
+  reader.readAsDataURL(file);
+}
+
+window.onload = () => {
+  fetchAllRecords();
+  document.getElementById("searchBtn").onclick = searchById;
+  document.getElementById("uploadBtn").onclick = uploadDocument;
+};
+</script>
+
+<footer>
+  <p>© 2025 Good Health & Vaccination Awareness Initiative</p>
+</footer>
+
+</body>
+</html>
